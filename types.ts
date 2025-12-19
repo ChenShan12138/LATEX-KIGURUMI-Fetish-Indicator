@@ -3,7 +3,8 @@ export type Language = 'zh' | 'en' | 'ja';
 
 export interface AnalysisResult {
   rating: number; // 1-7
-  summaryPhrase: string;
+  summaryPhraseZh: string;
+  summaryPhraseEn: string;
   comment: string;
   dimensions: {
     name: string;

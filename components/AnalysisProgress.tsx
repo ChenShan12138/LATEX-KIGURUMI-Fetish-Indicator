@@ -46,7 +46,7 @@ export const AnalysisProgress: React.FC<Props> = ({ lang }) => {
           {dict.analyzing}
         </h3>
         <p className="text-zinc-500 italic font-serif text-lg">
-          "{dict.sinkingStages[stageIndex]}"
+          {dict.sinkingStages[stageIndex]}
         </p>
       </div>
 

@@ -1,3 +1,4 @@
+
 import { Dictionary, Language } from './types';
 
 export const DICTIONARIES: Record<Language, Dictionary> = {
@@ -60,7 +61,7 @@ export const QUOTES = [
   "意志正在被拉链锁死在黑暗中。",
   "欢迎来到无需思考的标本世界。",
   "你是被精密加工过的、最完美的耗材。"
-];
+].map(q => q.replace(/["“”]/g, ''));
 
 export const FLOW_NUMBERS = [
   "Form_Sync: 98.4%",
