@@ -7,7 +7,7 @@ import { AnalysisProgress } from './components/AnalysisProgress';
 import { ResultView } from './components/ResultView';
 import { analyzeFetishImage } from './geminiService';
 
-const VERSION = "v1.2.6";
+const VERSION = "v1.2.7";
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('zh');
@@ -38,7 +38,10 @@ const App: React.FC = () => {
       const res = await analyzeFetishImage(imgData, lang);
       setResult(res);
     } catch (err: any) {
-      setError(lang === 'zh' ? "分析失败。请检查您的网络连接或 API 配置。" : "Analysis failed. Verify your network or API configuration.");
+      const msg = lang === 'zh' 
+        ? "评估中断。服务暂时不可用或配置失效。请检查网络连接。" 
+        : "Assessment Aborted. Service unavailable or invalid configuration. Please check your connection.";
+      setError(msg);
       console.error(err);
       setImage(null);
     } finally {
