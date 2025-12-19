@@ -53,29 +53,18 @@
             backdrop-filter: blur(12px);
         }
 
-        /* html2canvas stability fixes for Chinese text */
+        /* html2canvas stability fixes */
         .export-text {
-            display: block; /* Switched back to block for consistent text-indent */
-            margin: 0 !important;
-            padding: 0 !important;
-            line-height: 1.6;
-            text-align: left;
-            word-break: break-all;
-            white-space: normal;
+            display: inline; /* Changed from inline-block to prevent erroneous newlines */
+            vertical-align: baseline;
+            line-height: inherit;
         }
 
-        .indent-text {
-            text-indent: 2em; /* Ensure two Chinese characters width indent */
+        /* Use a standard block with padding for indent instead of text-indent which is flaky in canvas */
+        .indent-block {
+            padding-left: 2em;
         }
 
-        /* Ensure no gaps that cause ghost newlines in canvas */
-        .export-text span {
-            display: inline;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Ensure clean rendering in canvas */
         #capture-container * {
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
@@ -88,11 +77,25 @@
         
         .frame-corner {
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
             border-color: #06b6d4;
             border-style: solid;
         }
+
+        /* Browser Chrome Mockup */
+        .window-header {
+            background: #111;
+            border-bottom: 1px solid #222;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
     </style>
 <script type="importmap">
 {

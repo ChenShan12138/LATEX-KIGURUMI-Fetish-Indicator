@@ -7,7 +7,7 @@ import { AnalysisProgress } from './components/AnalysisProgress';
 import { ResultView } from './components/ResultView';
 import { analyzeFetishImage } from './geminiService';
 
-const VERSION = "v2.0.5";
+const VERSION = "v2.0.6";
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('zh');
