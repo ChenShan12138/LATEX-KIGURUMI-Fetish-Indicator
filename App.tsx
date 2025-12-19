@@ -7,6 +7,8 @@ import { AnalysisProgress } from './components/AnalysisProgress';
 import { ResultView } from './components/ResultView';
 import { analyzeFetishImage } from './geminiService';
 
+const VERSION = "v1.2.1";
+
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('zh');
   const [image, setImage] = useState<string | null>(null);
@@ -157,6 +159,9 @@ const App: React.FC = () => {
         <p className="text-[10px] text-zinc-600 text-center max-w-2xl px-4 italic">
           {dict.disclaimer}
         </p>
+        <div className="mt-4 text-[9px] font-mono text-zinc-800 tracking-widest uppercase">
+          Build_Version: {VERSION}
+        </div>
       </footer>
     </div>
   );

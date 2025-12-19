@@ -41,7 +41,7 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
         windowWidth: 1200,
       });
       const link = document.createElement('a');
-      link.download = `LATEX_REPORT_${Date.now()}.png`;
+      link.download = `FORM_REPORT_${Date.now()}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (err) {
@@ -150,7 +150,7 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
         {/* Footer info */}
         <div className="mt-8 text-center space-y-1 opacity-20 border-t border-zinc-900 pt-6">
            <p className="text-[7px] text-zinc-600 font-mono tracking-[0.4em] uppercase">
-             // NON_HUMAN_OBJECTIFICATION_PROTOCOL_V2.5 //
+             // PROTOCOL_V2.5_MORPHOLOGY_ASSESSMENT //
            </p>
         </div>
       </div>

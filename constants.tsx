@@ -4,63 +4,63 @@ import { Dictionary, Language } from './types';
 export const DICTIONARIES: Record<Language, Dictionary> = {
   zh: {
     title: "填充物素体品质评估",
-    subtitle: "人体形态塑形工程 · 第二层皮肤重塑终端",
+    subtitle: "人体曲线重塑工程 · 第二层皮肤契合终端",
     uploadBtn: "接入素材",
-    analyzing: "真空泵运转中... 意志抽取...",
-    resultTitle: "素材评级报告",
+    analyzing: "材质扫描中... 灵魂共鸣...",
+    resultTitle: "形态评级报告",
     warning: "权限确认: 成年/自愿 (18+)",
-    disclaimer: "系统正在对该物件进行非人化评估。请确保您已准备好放弃主权。",
+    disclaimer: "系统正在对该素材进行深度契合度分析。请确保您已准备好完全沉浸其中。",
     sinkingStages: [
-      "正在移除生物特征...",
-      "材质完美度检测...",
-      "意志残留清除中...",
-      "最终人偶化封装..."
+      "正在提取视觉特征...",
+      "材质质感深度检测...",
+      "光泽反射率分析中...",
+      "最终形态契合确认..."
     ],
     onReset: "清除素材"
   },
   en: {
     title: "BODY PADDING ASSESSMENT",
-    subtitle: "Form Liquefaction · Reshaping Terminal",
+    subtitle: "Curve Reshaping · Second Skin Terminal",
     uploadBtn: "ACCESS ASSET",
-    analyzing: "PUMPING... EXTRACTING WILL...",
-    resultTitle: "ASSET CLASSIFICATION",
+    analyzing: "SCANNING... SYNCING SPIRIT...",
+    resultTitle: "FORM CLASSIFICATION",
     warning: "AUTH: ADULT (18+)",
-    disclaimer: "Dehumanization assessment in progress. Subject is treated as material.",
+    disclaimer: "Deep conformance analysis in progress. Prepare to immerse yourself completely.",
     sinkingStages: [
-      "Removing bio-traits...",
-      "Testing material fit...",
-      "Clearing identity residuals...",
-      "Final objectification..."
+      "Extracting visual traits...",
+      "Testing material texture...",
+      "Analyzing reflection...",
+      "Finalizing form sync..."
     ],
     onReset: "Clear Asset"
   },
   ja: {
     title: "填充物素体品質評価",
-    subtitle: "人間性液化工程 · 第二の皮膚再構築端末",
+    subtitle: "曲線再構築工程 · 第二の皮膚適合端末",
     uploadBtn: "素材をアクセス",
-    analyzing: "真空引き中... 意志を抽出中...",
-    resultTitle: "素材格付けレポート",
+    analyzing: "スキャン中... 共鳴中...",
+    resultTitle: "形態格付けレポート",
     warning: "権限确认: 成人 (18+)",
-    disclaimer: "このオブジェクトは现在、非人间化评価を受けています。",
+    disclaimer: "この素材は現在、適合性分析を受けています。完全に没入する準備をしてください。",
     sinkingStages: [
-      "生物学的特徴を削除中...",
-      "材质适合テスト...",
-      "自我の残滓を消去中...",
-      "最终的な物件化..."
+      "視覚的特徴を抽出中...",
+      "材質質感テスト...",
+      "光沢反射率を分析中...",
+      "最終適合確認..."
     ],
     onReset: "素材をクリア"
   }
 };
 
 export const QUOTES = [
-  "消解人格，重塑完美。",
-  "此时，你不再是人，只是一层闪耀的材质。",
-  "真空泵的声音，是你唯一的呼吸节奏。",
-  "第二层皮肤，比真皮更值得信任。",
-  "黑色的深邃中，只有你被人偶化的躯壳。",
-  "意志正在被拉链锁死在黑暗中。",
-  "欢迎来到无需思考的标本世界。",
-  "你是被精密加工过的、最完美的耗材。"
+  "重塑曲线，追求极致。",
+  "此时，你与这层闪耀的材质融为一体。",
+  "拉链划过的声音，是契合的序曲。",
+  "第二层皮肤，比真皮更契合灵魂。",
+  "在反光的世界中，找寻最完美的自我。",
+  "意志正在随材质的包裹而升温。",
+  "欢迎来到光泽与紧致的艺术领域。",
+  "你是这件艺术品最完美的填充。"
 ].map(q => q.replace(/["“”]/g, ''));
 
 export const FLOW_NUMBERS = [
@@ -68,8 +68,8 @@ export const FLOW_NUMBERS = [
   "Will_Residue: 0.01%",
   "Elasticity_Stress: 54kg",
   "Shine_Reflection: 98%",
-  "Identity_Status: DELETED",
+  "Identity_Status: ANALYZED",
   "Encapsulation: TOTAL",
-  "Pulse_Sync: CONTROLLED",
+  "Pulse_Sync: SYNCED",
   "Material_Report: READY"
 ];
