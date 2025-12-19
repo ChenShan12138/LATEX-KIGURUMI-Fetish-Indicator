@@ -1,3 +1,4 @@
+
 import React, { useRef, useState } from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from 'recharts';
 import { AnalysisResult, Language } from '../types';
@@ -14,9 +15,9 @@ interface Props {
 const GRADE_MAP = ["D", "C", "B", "A", "S", "SS", "SSS"];
 
 const GET_GRADE_COLORS = (rating: number) => {
-  if (rating >= 7) return { text: 'text-yellow-400', glow: 'shadow-[0_0_30px_rgba(250,204,21,0.5)]', radar: '#facc15', fill: '#facc15' };
-  if (rating >= 5) return { text: 'text-fuchsia-500', glow: 'shadow-[0_0_25px_rgba(217,70,239,0.5)]', radar: '#d946ef', fill: '#d946ef' };
-  if (rating >= 3) return { text: 'text-cyan-400', glow: 'shadow-[0_0_20px_rgba(34,211,238,0.4)]', radar: '#22d3ee', fill: '#22d3ee' };
+  if (rating >= 7) return { text: 'text-yellow-400', glow: 'drop-shadow-[0_0_15px_rgba(250,204,21,0.6)]', radar: '#facc15', fill: '#facc15' };
+  if (rating >= 5) return { text: 'text-fuchsia-500', glow: 'drop-shadow-[0_0_15px_rgba(217,70,239,0.6)]', radar: '#d946ef', fill: '#d946ef' };
+  if (rating >= 3) return { text: 'text-cyan-400', glow: 'drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]', radar: '#22d3ee', fill: '#22d3ee' };
   return { text: 'text-zinc-500', glow: '', radar: '#71717a', fill: '#71717a' };
 };
 
@@ -32,18 +33,17 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
     setSaving(true);
     
     try {
-      // Use a consistent window width for export to prevent layout squeezing in the image
       const canvas = await html2canvas(reportRef.current, {
         backgroundColor: '#050505',
         scale: 2,
         useCORS: true,
         logging: false,
-        windowWidth: 1400, // Slightly wider to ensure horizontal breathing room
+        windowWidth: 1600, // Ensure wide layout for capture
         onclone: (clonedDoc) => {
           const el = clonedDoc.getElementById('capture-container');
           if (el) {
-            el.style.width = '1400px';
-            el.style.padding = '60px';
+            el.style.width = '1600px';
+            el.style.padding = '80px';
             el.style.borderRadius = '0px';
             el.style.border = 'none';
           }
@@ -81,7 +81,7 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
           </div>
         </div>
 
-        <div className="grid xl:grid-cols-[400px_1fr] gap-12 items-start">
+        <div className="grid xl:grid-cols-[450px_1fr] gap-12 items-start">
           
           {/* Left Column: Specimen Image */}
           <div className="space-y-6">
@@ -114,11 +114,12 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
           </div>
 
           {/* Right Column: Evaluation Terminal */}
-          <div className="space-y-10">
-            <div className="flex flex-col md:flex-row gap-8 items-start justify-between bg-zinc-950/20 border border-zinc-900/50 p-8 rounded-3xl">
+          <div className="space-y-12">
+            {/* Header and Grade Row */}
+            <div className="flex flex-col md:flex-row gap-8 items-center justify-between bg-zinc-950/20 border border-zinc-900/50 p-8 md:p-10 rounded-3xl overflow-hidden min-h-[360px]">
               
-              {/* Summary Header */}
-              <div className="flex-1 space-y-6 min-w-0">
+              {/* Summary Header - Wrapped in a container with min-width to prevent squeezing */}
+              <div className="flex-1 space-y-6 min-w-0 w-full md:w-auto">
                 <div className="flex items-center gap-3">
                   <div className={`w-2 h-2 rounded-full animate-pulse ${result.rating >= 5 ? 'bg-fuchsia-500' : 'bg-cyan-500'}`}></div>
                   <span className={`font-orbitron text-[10px] tracking-[0.4em] uppercase ${result.rating >= 5 ? 'text-fuchsia-500' : 'text-cyan-500'}`}>
@@ -126,28 +127,31 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
                   </span>
                 </div>
                 
-                <h2 className="text-4xl md:text-5xl lg:text-6xl font-orbitron font-black text-white tracking-tighter italic leading-tight break-words">
+                <h2 className="text-4xl md:text-5xl lg:text-7xl font-orbitron font-black text-white tracking-tighter italic leading-[1.1] break-words whitespace-normal">
                   {result.summaryPhrase}
                 </h2>
                 
                 <div className={`h-1 w-32 bg-gradient-to-r from-transparent via-current to-transparent opacity-50 ${result.rating >= 5 ? 'text-fuchsia-600' : 'text-cyan-600'}`}></div>
               </div>
 
-              {/* Radar Chart Section - Removed Boxy Background */}
-              <div className="relative w-full md:w-[300px] h-[300px] shrink-0">
+              {/* Radar Chart Section - Centered with Grade */}
+              <div className="relative w-full md:w-[320px] h-[320px] shrink-0 flex items-center justify-center">
+                {/* Grade Label - Background removed as requested */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
                   <div className={`font-orbitron font-black italic select-none transition-all duration-1000 flex flex-col items-center ${colors.text}`}>
-                    <span className="text-[10px] tracking-[0.5em] opacity-30 mb-[-10px]">GRADE</span>
-                    <span className={`text-[100px] leading-none drop-shadow-2xl`}>
+                    <span className="text-[12px] tracking-[0.6em] opacity-30 mb-[-15px]">GRADE</span>
+                    <span className={`text-[120px] md:text-[140px] leading-none ${colors.glow}`}>
                       {gradeLabel}
                     </span>
                   </div>
                 </div>
+                
+                {/* Radar Overlay */}
                 <div className="absolute inset-0 z-10">
                   <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart data={result.dimensions} margin={{ top: 30, right: 30, bottom: 30, left: 30 }}>
+                    <RadarChart data={result.dimensions} margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>
                       <PolarGrid stroke="#222" />
-                      <PolarAngleAxis dataKey="name" tick={{ fill: '#666', fontSize: 9, fontFamily: 'JetBrains Mono' }} />
+                      <PolarAngleAxis dataKey="name" tick={{ fill: '#666', fontSize: 10, fontFamily: 'JetBrains Mono' }} />
                       <Radar
                         name="Value"
                         dataKey="value"
@@ -163,7 +167,7 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
             </div>
 
             {/* Comment Section */}
-            <div className="space-y-6">
+            <div className="space-y-8">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="font-mono text-[10px] text-zinc-500 tracking-widest uppercase">
@@ -173,23 +177,24 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
                 <div className="h-px flex-1 bg-zinc-900"></div>
               </div>
 
-              <div className="relative pl-10">
+              <div className="relative pl-12">
                 <div className={`absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-transparent via-current to-transparent opacity-40 ${colors.text}`}></div>
-                <p className="text-zinc-200 font-serif text-xl md:text-2xl leading-relaxed italic selection:bg-cyan-500/40 whitespace-pre-wrap">
+                <p className="text-zinc-200 font-serif text-2xl md:text-3xl leading-relaxed italic selection:bg-cyan-500/40 whitespace-pre-wrap">
                   {result.comment}
                 </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-10 border-t border-zinc-900/50">
+            {/* Sub-metrics */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-12 border-t border-zinc-900/50">
               {["MATERIAL_PURITY", "BODY_CONFORMANCE", "WILL_STABILITY", "REFLECTIVE_INDEX"].map((label, i) => (
-                <div key={i} className="space-y-2">
+                <div key={i} className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-[8px] font-mono text-zinc-600 uppercase tracking-tighter">{label}</span>
-                    <span className="text-[8px] font-mono text-zinc-400">{(Math.random() * 20 + 80).toFixed(1)}%</span>
+                    <span className="text-[9px] font-mono text-zinc-600 uppercase tracking-tighter">{label}</span>
+                    <span className="text-[9px] font-mono text-zinc-400">{(Math.random() * 15 + 85).toFixed(1)}%</span>
                   </div>
-                  <div className="h-0.5 bg-zinc-900 rounded-full overflow-hidden">
-                    <div className="h-full bg-zinc-700 w-full opacity-50 animate-pulse" style={{ animationDelay: `${i * 0.2}s` }}></div>
+                  <div className="h-1 bg-zinc-900 rounded-full overflow-hidden">
+                    <div className="h-full bg-zinc-700 w-full opacity-40 animate-pulse" style={{ animationDelay: `${i * 0.2}s` }}></div>
                   </div>
                 </div>
               ))}
@@ -198,33 +203,33 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
         </div>
 
         {/* Capturable Footer */}
-        <div className="mt-16 pt-8 border-t border-zinc-900 text-center space-y-2 opacity-50">
-           <p className="text-[9px] text-zinc-600 font-mono tracking-[0.4em] uppercase">
-             // FORM_LIQUEFACTION_TERMINAL_V2.0 //
+        <div className="mt-20 pt-10 border-t border-zinc-900 text-center space-y-3 opacity-40">
+           <p className="text-[10px] text-zinc-600 font-mono tracking-[0.5em] uppercase">
+             // RE-SHAPING_BODY_TERMINAL_V2.0_ASSESSMENT_SYSTEM //
            </p>
-           <p className="text-[7px] text-zinc-800 font-mono tracking-widest uppercase">
-             Unauthorized extraction of specimen data is strictly prohibited by central command
+           <p className="text-[8px] text-zinc-800 font-mono tracking-widest uppercase max-w-2xl mx-auto leading-loose">
+             This report is a certified document of the central assessment unit. Any alteration or unauthorized reproduction of the subject's parameters is a violation of the mannequin protocol.
            </p>
         </div>
       </div>
 
       {/* Persistent Controls (Not Captured) */}
-      <div className="flex flex-col sm:flex-row gap-6 max-w-2xl mx-auto pt-6">
+      <div className="flex flex-col sm:flex-row gap-6 max-w-2xl mx-auto pt-10">
         <button 
           onClick={handleSaveReport}
           disabled={saving}
-          className="flex-1 px-10 py-6 bg-cyan-600 text-white font-orbitron text-xs font-black tracking-[0.3em] hover:bg-cyan-500 transition-all duration-300 rounded-[24px] shadow-2xl hover:shadow-cyan-600/30 uppercase group flex flex-col items-center disabled:opacity-50"
+          className="flex-1 px-10 py-7 bg-cyan-600 text-white font-orbitron text-sm font-black tracking-[0.3em] hover:bg-cyan-500 transition-all duration-300 rounded-[28px] shadow-2xl hover:shadow-cyan-600/40 uppercase group flex flex-col items-center disabled:opacity-50"
         >
-          <span className="mb-1">{saving ? '正在处理数据流...' : (lang === 'zh' ? '导出完整评估报告' : 'EXPORT REPORT')}</span>
-          <span className="text-[8px] opacity-40 font-mono tracking-widest">SYSTEM_EXPORT_PNG</span>
+          <span className="mb-1">{saving ? '正在加密导出报告...' : (lang === 'zh' ? '导出完整人偶化评估报告' : 'EXPORT REPORT')}</span>
+          <span className="text-[10px] opacity-40 font-mono tracking-widest">ENCRYPTED_PNG_EXPORT</span>
         </button>
         
         <button 
           onClick={onReset}
-          className="flex-1 px-10 py-6 bg-zinc-900/80 text-zinc-500 border border-zinc-800 font-orbitron text-xs font-black tracking-[0.3em] hover:bg-white hover:text-black transition-all duration-300 rounded-[24px] uppercase group flex flex-col items-center"
+          className="flex-1 px-10 py-7 bg-zinc-900/80 text-zinc-500 border border-zinc-800 font-orbitron text-sm font-black tracking-[0.3em] hover:bg-white hover:text-black transition-all duration-300 rounded-[28px] uppercase group flex flex-col items-center"
         >
           <span className="mb-1">{dict.onReset}</span>
-          <span className="text-[8px] opacity-40 font-mono tracking-widest">FLUSH_SPECIMEN</span>
+          <span className="text-[10px] opacity-40 font-mono tracking-widest">FLUSH_DATA_STREAM</span>
         </button>
       </div>
     </div>
