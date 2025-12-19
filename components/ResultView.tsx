@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Tooltip } from 'recharts';
 import { AnalysisResult, Language } from '../types';
-import { DICTIONARIES, RECONDITIONING_LOGS } from '../constants';
+import { DICTIONARIES } from '../constants';
 import html2canvas from 'html2canvas';
 
 interface Props {
@@ -41,6 +41,8 @@ const GET_GRADE_COLORS = (rating: number) => {
   };
 };
 
+const LABEL_STYLE = "text-[10px] font-mono text-zinc-500 uppercase tracking-[0.3em] font-bold";
+
 const HighlightedTitle: React.FC<{ text: string; keywords: string[]; accent: string }> = ({ text, keywords, accent }) => {
   const cleanText = text.trim();
   if (!keywords || keywords.length === 0) {
@@ -55,9 +57,16 @@ const HighlightedTitle: React.FC<{ text: string; keywords: string[]; accent: str
   );
 };
 
-const QuoteIcon: React.FC<{ className?: string }> = ({ className }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-    <path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017C19.5693 16 20.017 15.5523 20.017 15V9C20.017 8.44772 19.5693 8 19.017 8H16.017C14.9124 8 14.017 7.10457 14.017 6V3L11.017 3V21H14.017ZM5.017 21L5.017 18C5.017 16.8954 5.91243 16 7.017 16H10.017C10.5693 16 11.017 15.5523 11.017 15V9C11.017 8.44772 10.5693 8 10.017 8H7.017C5.91243 8 5.017 7.10457 5.017 6V3L2.017 3V21H5.017Z" />
+// Updated English Double Quotes Style SVG
+const QuoteIconLeft: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 32 32" fill="currentColor" className={className}>
+    <path d="M10 8c-3.3 0-6 2.7-6 6v10h10V14H8c0-2.2 1.8-4 4-4V8h-2zm14 0c-3.3 0-6 2.7-6 6v10h10V14h-6c0-2.2 1.8-4 4-4V8h-2z" />
+  </svg>
+);
+
+const QuoteIconRight: React.FC<{ className?: string }> = ({ className }) => (
+  <svg viewBox="0 0 32 32" fill="currentColor" className={className}>
+    <path d="M22 24c3.3 0 6-2.7 6-6V8H18v10h6c0 2.2-1.8 4-4 4v2h2zm-14 0c3.3 0 6-2.7 6-6V8H4v10h6c0 2.2-1.8 4-4 4v2h2z" />
   </svg>
 );
 
@@ -117,9 +126,8 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
         </span>
       </div>
       <div className="flex-1"></div>
-      <div className="h-full w-px bg-zinc-800/50 mx-4"></div>
-      <div className="text-right">
-        <div className="text-[10px] font-mono text-zinc-600 mb-1 export-text uppercase">Quality_Rank</div>
+      <div className="absolute bottom-4 right-6 text-right">
+        <div className={`${LABEL_STYLE} mb-1 export-text`}>Quality_Rank</div>
         <div className="text-xs font-bold text-white tracking-widest font-orbitron export-text uppercase leading-none">AUTHENTICATED</div>
       </div>
     </div>
@@ -128,7 +136,7 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
   const RadarBox = () => (
     <div className="tech-border rounded-3xl p-4 flex flex-col h-[380px]">
       <div className="flex justify-between items-center mb-2">
-        <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-widest export-text">Morphology_Stats</span>
+        <span className={`${LABEL_STYLE} export-text`}>Morphology_Stats</span>
         <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_#06b6d4]"></div>
       </div>
       <div className="flex-1 w-full h-full flex items-center justify-center">
@@ -154,7 +162,7 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
         </RadarChart>
       </div>
       <div className="text-center mt-1">
-         <span className="text-[8px] font-mono text-zinc-700 uppercase tracking-widest export-text">Scale: 0.0 - 10.0</span>
+         <span className={`${LABEL_STYLE} text-[8px] export-text opacity-70`}>Scale: 0.0 - 10.0</span>
       </div>
     </div>
   );
@@ -175,48 +183,49 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
   const CommentBox = () => (
     <div className="tech-border rounded-3xl p-8 md:p-10 flex flex-col h-full overflow-hidden relative">
       <div className="flex items-center gap-4 mb-6">
-        <span className="font-mono text-[10px] text-zinc-500 tracking-[0.4em] uppercase export-text text-left">CHIEF_OFFICER_LOG</span>
+        <span className={`${LABEL_STYLE} export-text text-left`}>CHIEF_OFFICER_LOG</span>
         <div className="h-px flex-1 bg-zinc-800/60"></div>
       </div>
       <div className="flex-1 flex flex-col items-start w-full z-10">
         <p className="text-zinc-200 font-sans text-lg md:text-2xl tracking-tight export-text indent-text italic font-medium text-left w-full whitespace-pre-wrap">{result.comment.trim()}</p>
       </div>
-      {/* Decorative Logs Overlay - Repositioned to bottom center to avoid text clash */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-10 font-mono text-[7px] text-cyan-400 pointer-events-none select-none text-center w-full px-10">
-        {RECONDITIONING_LOGS.slice(0, 2).join(' | ')}
-      </div>
     </div>
   );
 
   const DialogueBox = () => (
-    <div className="relative mt-4 rounded-3xl overflow-hidden bg-zinc-950/40 border border-zinc-800 p-8 md:p-14 lg:p-20">
-      <div className="absolute inset-0 flex items-center justify-center gap-1 opacity-5 px-10 pointer-events-none">
-        {Array.from({ length: 40 }).map((_, i) => (
-          <div 
-            key={i} 
-            className="w-1 bg-cyan-400 rounded-full transition-all duration-500" 
-            style={{ height: `${Math.random() * 60 + 10}%` }}
-          />
-        ))}
+    <div className="relative mt-4 rounded-3xl overflow-hidden bg-zinc-950/40 border border-zinc-800 p-8 md:p-14 lg:p-20 min-h-[300px] flex items-center">
+      {/* Voiceprint Waveform Background: Peaking in center */}
+      <div className="absolute inset-0 flex items-center justify-between gap-[3px] opacity-25 px-6 pointer-events-none">
+        {Array.from({ length: 140 }).map((_, i) => {
+          const total = 140;
+          const center = total / 2;
+          const distFromCenter = Math.abs(i - center);
+          // Bell-ish curve weight
+          const weight = Math.pow(1 - distFromCenter / center, 1.5);
+          
+          return (
+            <div 
+              key={i} 
+              className="flex-1 bg-cyan-500 rounded-full transition-all duration-500" 
+              style={{ 
+                  height: `${(Math.sin(i * 0.15) * 20 + 35 + Math.random() * 45) * weight + 2}%`,
+                  backgroundColor: i % 12 === 0 ? '#22d3ee' : '#0891b2'
+              }}
+            />
+          );
+        })}
       </div>
       
-      {/* Aesthetic Side Log Labels - Repositioned far sides */}
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 opacity-20 pointer-events-none select-none text-right">
-        {RECONDITIONING_LOGS.slice(3, 5).map((log, i) => (
-          <div key={i} className="text-[7px] font-mono text-fuchsia-400 whitespace-nowrap uppercase tracking-widest">{log}</div>
-        ))}
-      </div>
+      <div className="relative z-10 w-full flex flex-col items-start max-w-5xl mx-auto px-6 md:px-12 text-left">
+        <QuoteIconLeft className="absolute -top-16 left-0 w-24 h-24 text-cyan-400/30 select-none pointer-events-none" />
+        <QuoteIconRight className="absolute -bottom-20 right-0 w-24 h-24 text-cyan-400/30 select-none pointer-events-none" />
 
-      <div className="relative z-10 w-full flex flex-col items-center max-w-5xl mx-auto px-6 md:px-12 text-center">
-        {/* Large Decorative SVG Quotes */}
-        <QuoteIcon className="absolute -top-12 left-0 w-16 h-16 text-cyan-900/40 rotate-180 select-none pointer-events-none" />
-        <QuoteIcon className="absolute -bottom-16 right-0 w-16 h-16 text-cyan-900/40 select-none pointer-events-none" />
-
-        <div className="flex items-center gap-2 mb-6 opacity-40 justify-center">
-           <div className="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-pulse"></div>
-           <span className="text-[8px] font-mono text-white tracking-[0.3em] uppercase">DIRECT_VOICE_SYNC</span>
+        <div className="flex items-center gap-2 mb-6 opacity-80">
+           <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_10px_#06b6d4]"></div>
+           <span className={`${LABEL_STYLE} text-cyan-400`}>DIRECT_VOICE_SYNC</span>
         </div>
-        <p className="text-cyan-400 font-sans text-2xl md:text-5xl font-black tracking-tighter italic leading-tight export-text text-center w-full drop-shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+        
+        <p className="text-cyan-400 font-sans text-2xl md:text-5xl font-black tracking-tighter italic leading-tight export-text indent-text text-left w-full drop-shadow-[0_0_20px_rgba(6,182,212,0.4)]">
           {result.summaryDialogue.trim()}
         </p>
       </div>
@@ -240,10 +249,6 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
           <div className="text-center md:text-left">
             <h4 className="text-white font-orbitron font-black text-[12px] tracking-[0.6em] uppercase export-text leading-none text-left">{dict.title}</h4>
             <p className="text-zinc-600 font-mono text-[9px] tracking-widest mt-2 export-text text-left">SECURE_DATA_PACKAGE // SYNC_STABLE</p>
-          </div>
-          {/* Decorative Log - Positioned center in header to stay clear of text */}
-          <div className="hidden lg:block absolute left-1/2 -translate-x-1/2 top-1 text-[8px] font-mono text-fuchsia-600 opacity-40 text-center tracking-widest uppercase">
-             {RECONDITIONING_LOGS[0]} <span className="mx-2 text-zinc-800">|</span> {RECONDITIONING_LOGS[1]}
           </div>
           <div className="text-[9px] font-mono text-zinc-700 tracking-[0.3em] uppercase text-center md:text-right leading-relaxed export-text text-right">
             SYSTEM_PROTOCOL_V3.0_RELEASE<br/>
@@ -270,7 +275,7 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
               <div className="relative bg-zinc-950/50 rounded-[2rem] border border-zinc-800/50 overflow-hidden shadow-2xl flex items-center justify-center min-h-[450px]">
                 <img src={image} alt="Specimen" className="max-w-full h-auto max-h-[80vh] block object-contain shadow-inner" />
                 <div className="absolute top-4 left-6 pointer-events-none">
-                  <span className="text-[7px] font-mono text-zinc-500 uppercase tracking-widest export-text">SCAN_RENDER_STABLE</span>
+                  <span className={`${LABEL_STYLE} export-text text-[8px]`}>SCAN_RENDER_STABLE</span>
                 </div>
               </div>
               <div className="flex flex-col gap-6 overflow-visible">
@@ -290,7 +295,7 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
                 <div className="relative bg-zinc-950/50 rounded-[2rem] border border-zinc-800/50 overflow-hidden shadow-2xl flex items-center justify-center">
                   <img src={image} alt="Specimen" className="max-w-full h-auto max-h-[60vh] block object-contain shadow-inner" />
                   <div className="absolute top-4 right-6 pointer-events-none">
-                    <span className="text-[7px] font-mono text-zinc-500 uppercase tracking-widest export-text">SCAN_RENDER_STABLE</span>
+                    <span className={`${LABEL_STYLE} export-text text-[8px]`}>SCAN_RENDER_STABLE</span>
                   </div>
                 </div>
               </div>
@@ -309,10 +314,6 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
 
         {/* Global Bottom Section with 3 centered lines */}
         <div className="mt-12 pt-8 border-t border-zinc-900/50 flex flex-col items-center gap-3 relative">
-          {/* Background Decorative Log - Bottom center */}
-          <div className="absolute -top-4 opacity-10 text-[7px] font-mono text-cyan-600 tracking-[1em] uppercase pointer-events-none">
-             {RECONDITIONING_LOGS[RECONDITIONING_LOGS.length-1]}
-          </div>
           <div className="text-[10px] font-mono text-zinc-600 uppercase tracking-[0.5em] export-text text-center">
             Authorized_Protocol
           </div>
