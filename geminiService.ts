@@ -39,7 +39,11 @@ export const analyzeFetishImage = async (
   base64Image: string,
   lang: Language
 ): Promise<AnalysisResult> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // Support custom API endpoints via baseUrl if process.env.API_URL is provided
+  const ai = new GoogleGenAI({ 
+    apiKey: process.env.API_KEY,
+    baseUrl: process.env.API_URL 
+  });
   
   const compressedImage = await resizeImage(base64Image);
   const base64Data = compressedImage.split(',')[1];

@@ -7,7 +7,7 @@ import { AnalysisProgress } from './components/AnalysisProgress';
 import { ResultView } from './components/ResultView';
 import { analyzeFetishImage } from './geminiService';
 
-const VERSION = "v1.2.3";
+const VERSION = "v1.2.4";
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('zh');
@@ -33,7 +33,7 @@ const App: React.FC = () => {
 
   /**
    * Triggers the analysis workflow.
-   * API Key is managed via environment variables and injected automatically.
+   * API Key and optional Base URL are managed via environment variables and injected automatically.
    */
   const processAnalysis = async (imgData: string) => {
     setAnalyzing(true);
