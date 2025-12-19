@@ -15,7 +15,7 @@ interface Props {
 const GRADE_MAP = ["D", "C", "B", "A", "S", "SS", "SSS"];
 
 const GET_GRADE_COLORS = (rating: number) => {
-  // Base colors with blue (cyan) accents as requested
+  // Base colors with blue (cyan) accents
   const blueAccent = '#06b6d4'; // cyan-500
   
   if (rating >= 7) return { 
@@ -108,14 +108,20 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
           {/* Main Visual Content: Image (Left) and Radar (Right) */}
           <div className="flex flex-col md:flex-row gap-8 lg:gap-12 items-center justify-center">
             
-            {/* Specimen Image */}
+            {/* Specimen Image Container */}
             <div className="shrink-0">
               <div className="bg-zinc-950 border border-zinc-800 rounded-3xl p-1 shadow-2xl relative overflow-hidden w-[240px] md:w-[280px]">
+                {/* 
+                  Enhanced image rendering:
+                  Using aspect-ratio container with object-fit: cover ensures the image
+                  is scaled to fill the box while maintaining its native ratio.
+                  object-position: center keeps the subject in the middle.
+                */}
                 <div className="aspect-[3/4] w-full relative rounded-2xl overflow-hidden bg-black">
                   <img 
                     src={image} 
-                    alt="Specimen" 
-                    className="w-full h-full object-cover"
+                    alt="Assessed Specimen"
+                    className="absolute inset-0 w-full h-full object-cover object-center"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none"></div>
                   <div className="absolute top-3 left-3">
