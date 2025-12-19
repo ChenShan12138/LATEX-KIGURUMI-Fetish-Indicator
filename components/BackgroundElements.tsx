@@ -1,12 +1,13 @@
 
 import React, { useEffect, useState } from 'react';
-import { FLOW_NUMBERS } from '../constants';
+import { FLOW_NUMBERS, RECONDITIONING_LOGS } from '../constants';
 
 export const BackgroundElements: React.FC = () => {
   const [offsets, setOffsets] = useState<number[]>([]);
+  const combinedLog = [...FLOW_NUMBERS, ...RECONDITIONING_LOGS];
 
   useEffect(() => {
-    setOffsets(FLOW_NUMBERS.map(() => Math.random() * 100));
+    setOffsets(combinedLog.map(() => Math.random() * 100));
   }, []);
 
   return (
@@ -16,10 +17,10 @@ export const BackgroundElements: React.FC = () => {
       
       {/* Floating Data Streams */}
       <div className="absolute top-0 right-10 flex flex-col gap-8">
-        {FLOW_NUMBERS.map((text, i) => (
+        {combinedLog.map((text, i) => (
           <div 
             key={i}
-            className="text-[10px] text-cyan-400 font-mono whitespace-nowrap animate-pulse"
+            className={`text-[10px] font-mono whitespace-nowrap animate-pulse ${i >= FLOW_NUMBERS.length ? 'text-fuchsia-400/50' : 'text-cyan-400'}`}
             style={{ 
               transform: `translateY(${offsets[i]}vh)`,
               animationDelay: `${i * 0.5}s`
