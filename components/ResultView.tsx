@@ -15,10 +15,37 @@ interface Props {
 const GRADE_MAP = ["D", "C", "B", "A", "S", "SS", "SSS"];
 
 const GET_GRADE_COLORS = (rating: number) => {
-  if (rating >= 7) return { text: 'text-yellow-400', glow: 'drop-shadow-[0_0_15px_rgba(250,204,21,0.6)]', radar: '#facc15', fill: '#facc15' };
-  if (rating >= 5) return { text: 'text-fuchsia-500', glow: 'drop-shadow-[0_0_15px_rgba(217,70,239,0.6)]', radar: '#d946ef', fill: '#d946ef' };
-  if (rating >= 3) return { text: 'text-cyan-400', glow: 'drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]', radar: '#22d3ee', fill: '#22d3ee' };
-  return { text: 'text-zinc-500', glow: '', radar: '#71717a', fill: '#71717a' };
+  // Base colors with blue (cyan) accents as requested
+  const blueAccent = '#06b6d4'; // cyan-500
+  
+  if (rating >= 7) return { 
+    grade: 'text-yellow-400', 
+    gradeGlow: 'drop-shadow-[0_0_25px_rgba(250,204,21,0.8)]', 
+    radarStroke: blueAccent, 
+    radarFill: blueAccent,
+    radarOpacity: 0.2
+  };
+  if (rating >= 5) return { 
+    grade: 'text-fuchsia-500', 
+    gradeGlow: 'drop-shadow-[0_0_20px_rgba(217,70,239,0.7)]', 
+    radarStroke: blueAccent, 
+    radarFill: blueAccent,
+    radarOpacity: 0.15
+  };
+  if (rating >= 3) return { 
+    grade: 'text-cyan-400', 
+    gradeGlow: 'drop-shadow-[0_0_15px_rgba(34,211,238,0.6)]', 
+    radarStroke: '#f472b6', // pink-400 as accent for cyan grade
+    radarFill: '#f472b6',
+    radarOpacity: 0.15
+  };
+  return { 
+    grade: 'text-zinc-500', 
+    gradeGlow: '', 
+    radarStroke: blueAccent, 
+    radarFill: blueAccent,
+    radarOpacity: 0.1
+  };
 };
 
 export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) => {
@@ -56,13 +83,13 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
       <div 
         ref={reportRef} 
         id="capture-container"
-        className="bg-[#050505] p-8 md:p-12 rounded-[40px] border border-zinc-900 overflow-hidden shadow-2xl flex flex-col gap-8"
+        className="bg-[#050505] p-8 md:p-12 rounded-[40px] border border-zinc-900 overflow-hidden shadow-2xl flex flex-col gap-8 relative"
       >
         {/* Top Centered Titles */}
-        <div className="text-center space-y-3">
+        <div className="text-center space-y-3 relative z-10">
           <div className="flex items-center justify-center gap-3 mb-2">
-            <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${result.rating >= 5 ? 'bg-fuchsia-500 shadow-[0_0_8px_#d946ef]' : 'bg-cyan-500 shadow-[0_0_8px_#06b6d4]'}`}></div>
-            <span className={`font-orbitron text-[9px] tracking-[0.5em] uppercase ${result.rating >= 5 ? 'text-fuchsia-500' : 'text-cyan-500'}`}>
+            <div className={`w-1.5 h-1.5 rounded-full animate-pulse bg-cyan-500 shadow-[0_0_8px_#06b6d4]`}></div>
+            <span className="font-orbitron text-[9px] tracking-[0.5em] uppercase text-cyan-500">
               Assessment_Summary
             </span>
           </div>
@@ -72,11 +99,11 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
           <h3 className="text-base md:text-xl font-orbitron font-bold text-zinc-500 tracking-[0.2em] uppercase italic opacity-80 leading-none">
             {result.summaryPhraseEn}
           </h3>
-          <div className={`h-0.5 w-48 mx-auto mt-4 bg-gradient-to-r from-transparent via-current to-transparent opacity-30 ${result.rating >= 5 ? 'text-fuchsia-600' : 'text-cyan-600'}`}></div>
+          <div className="h-0.5 w-48 mx-auto mt-4 bg-gradient-to-r from-transparent via-cyan-600 to-transparent opacity-30"></div>
         </div>
 
         {/* Evaluation Box (Contains Image & Radar) */}
-        <div className="bg-zinc-950/40 border border-zinc-900/50 p-8 md:p-10 rounded-[32px] space-y-10">
+        <div className="bg-zinc-950/40 border border-zinc-900/50 p-8 md:p-10 rounded-[32px] space-y-10 relative z-10">
           
           {/* Main Visual Content: Image (Left) and Radar (Right) */}
           <div className="flex flex-col md:flex-row gap-8 lg:gap-12 items-center justify-center">
@@ -92,7 +119,7 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none"></div>
                   <div className="absolute top-3 left-3">
-                    <span className={`text-white text-[7px] font-black px-2 py-0.5 rounded-full italic shadow-lg backdrop-blur-md border border-white/10 ${result.rating >= 5 ? 'bg-fuchsia-600/80' : 'bg-cyan-600/80'}`}>
+                    <span className="text-white text-[7px] font-black px-2 py-0.5 rounded-full italic shadow-lg backdrop-blur-md border border-white/10 bg-cyan-600/80">
                       ASSET_LOCKED
                     </span>
                   </div>
@@ -102,16 +129,7 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
 
             {/* Radar Chart Section */}
             <div className="relative w-full md:w-[320px] lg:w-[380px] aspect-square flex items-center justify-center">
-              {/* Grade Label: Centered inside Radar */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-                <div className={`font-orbitron font-black italic flex flex-col items-center ${colors.text} translate-y-2`}>
-                  <span className="text-[8px] tracking-[0.5em] opacity-30 mb-[-12px] uppercase">Grade</span>
-                  <span className={`text-[120px] md:text-[140px] lg:text-[160px] leading-none ${colors.glow}`}>
-                    {gradeLabel}
-                  </span>
-                </div>
-              </div>
-              
+              {/* Radar Chart: Background/Middle Layer */}
               <div className="absolute inset-0 z-10">
                 <ResponsiveContainer width="100%" height="100%">
                   <RadarChart data={result.dimensions} margin={{ top: 40, right: 40, bottom: 40, left: 40 }}>
@@ -120,13 +138,23 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
                     <Radar
                       name="Value"
                       dataKey="value"
-                      stroke={colors.radar}
-                      fill={colors.fill}
-                      fillOpacity={0.12}
+                      stroke={colors.radarStroke}
+                      fill={colors.radarFill}
+                      fillOpacity={colors.radarOpacity}
                       animationDuration={1500}
                     />
                   </RadarChart>
                 </ResponsiveContainer>
+              </div>
+
+              {/* Grade Label: TOP LAYER */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                <div className={`font-orbitron font-black italic flex flex-col items-center ${colors.grade} translate-y-2`}>
+                  <span className="text-[8px] tracking-[0.5em] opacity-40 mb-[-12px] uppercase">Grade</span>
+                  <span className={`text-[120px] md:text-[140px] lg:text-[160px] leading-none ${colors.gradeGlow}`}>
+                    {gradeLabel}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -147,16 +175,28 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
           </div>
         </div>
 
-        {/* Footer info */}
-        <div className="mt-8 text-center space-y-1 opacity-20 border-t border-zinc-900 pt-6">
-           <p className="text-[7px] text-zinc-600 font-mono tracking-[0.4em] uppercase">
+        {/* Footer info (Always visible in UI and Export) */}
+        <div className="mt-8 text-center space-y-4 border-t border-zinc-900 pt-8 relative z-10">
+           <div className="flex flex-col items-center gap-1">
+             <h4 className="text-white font-orbitron font-bold text-xs tracking-[0.3em] uppercase">
+               {dict.title}
+             </h4>
+             <p className="text-cyan-500 font-mono text-[10px] tracking-wider opacity-80">
+               https://latex-kigurumi-fetish-indicator.vercel.app/
+             </p>
+           </div>
+           <p className="text-[7px] text-zinc-600 font-mono tracking-[0.4em] uppercase opacity-40">
              // PROTOCOL_V2.5_MORPHOLOGY_ASSESSMENT //
            </p>
         </div>
+
+        {/* Decorative corner accents for the export */}
+        <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-zinc-800 rounded-tl-[40px] pointer-events-none"></div>
+        <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-zinc-800 rounded-br-[40px] pointer-events-none"></div>
       </div>
 
       {/* Buttons (Not Captured) */}
-      <div className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto pt-4">
+      <div className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto pt-4 relative z-50">
         <button 
           onClick={handleSaveReport}
           disabled={saving}

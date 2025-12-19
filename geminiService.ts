@@ -39,10 +39,9 @@ export const analyzeFetishImage = async (
   base64Image: string,
   lang: Language
 ): Promise<AnalysisResult> => {
-  // Support custom API endpoints via baseUrl if process.env.API_URL is provided
+  // Initialize strictly using process.env.API_KEY as per guidelines. baseUrl is not supported.
   const ai = new GoogleGenAI({ 
-    apiKey: process.env.API_KEY,
-    baseUrl: process.env.API_URL 
+    apiKey: process.env.API_KEY
   });
   
   const compressedImage = await resizeImage(base64Image);
