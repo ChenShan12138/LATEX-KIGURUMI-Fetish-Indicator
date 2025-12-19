@@ -8,7 +8,7 @@ export const DICTIONARIES: Record<Language, Dictionary> = {
     uploadBtn: "接入素材",
     analyzing: "材质扫描中... 灵魂共鸣...",
     resultTitle: "形态评级报告",
-    warning: "权限确认: 成年/自愿 (18+)",
+    warning: "权限确认: 自愿 | 成年 (18+)",
     disclaimer: "系统正在对该素材进行深度契合度分析。请确保您已准备好完全沉浸其中。",
     sinkingStages: [
       "正在提取视觉特征...",
@@ -19,8 +19,8 @@ export const DICTIONARIES: Record<Language, Dictionary> = {
     onReset: "清除素材"
   },
   en: {
-    title: "BODY PADDING ASSESSMENT",
-    subtitle: "Curve Reshaping · Second Skin Terminal",
+    title: "FORM_QUALITY_ASSESS",
+    subtitle: "Curve Reshaping · Second Skin Interface",
     uploadBtn: "ACCESS ASSET",
     analyzing: "SCANNING... SYNCING SPIRIT...",
     resultTitle: "FORM CLASSIFICATION",
@@ -35,18 +35,18 @@ export const DICTIONARIES: Record<Language, Dictionary> = {
     onReset: "Clear Asset"
   },
   ja: {
-    title: "填充物素体品質評価",
-    subtitle: "曲線再構築工程 · 第二の皮膚適合端末",
+    title: "形态格付け品質評価",
+    subtitle: "曲线再構築工程 · 第二の皮肤适合端末",
     uploadBtn: "素材をアクセス",
     analyzing: "スキャン中... 共鳴中...",
-    resultTitle: "形態格付けレポート",
-    warning: "権限确认: 成人 (18+)",
-    disclaimer: "この素材は現在、適合性分析を受けています。完全に没入する準備をしてください。",
+    resultTitle: "形态格付けレポート",
+    warning: "权项确认: 成人 (18+)",
+    disclaimer: "この素材は现在、适合性分析を受けています。完全に没入する准备をしてください。",
     sinkingStages: [
       "視覚的特徴を抽出中...",
-      "材質質感テスト...",
+      "材质质感テスト...",
       "光沢反射率を分析中...",
-      "最終適合確認..."
+      "最终适合确认..."
     ],
     onReset: "素材をクリア"
   }

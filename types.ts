@@ -4,11 +4,14 @@ export type Language = 'zh' | 'en' | 'ja';
 export interface AnalysisResult {
   rating: number; // 1-7
   summaryPhraseZh: string;
+  summaryHighlightKeywords: string[]; // Specific words within summaryPhraseZh to highlight
   summaryPhraseEn: string;
   comment: string;
+  summaryDialogue: string; // The provocative quote
+  tags: string[]; // 1-6 short descriptive tags
   dimensions: {
-    name: string;
-    value: number; // 0-100
+    name: "精致" | "质感" | "张力" | "协调" | "诱惑";
+    value: number; // 0-10
   }[];
 }
 

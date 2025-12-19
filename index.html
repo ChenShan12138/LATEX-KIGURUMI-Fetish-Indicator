@@ -1,21 +1,33 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>填充物素体品质评估 | PADDING_BODY_ASSESSMENT</title>
+    <title>填充物素体品质评估 | FORM_QUALITY_ASSESS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --tech-cyan: #06b6d4;
+            --tech-fuchsia: #d946ef;
+        }
         body {
-            background-color: #050505;
-            color: #e2e8f0;
-            font-family: 'JetBrains Mono', monospace;
+            background-color: #020202;
+            color: #f1f5f9;
+            font-family: 'Inter', 'system-ui', sans-serif;
             overflow-x: hidden;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0;
         }
-        .font-orbitron {
-            font-family: 'Orbitron', sans-serif;
+        .font-orbitron { font-family: 'Orbitron', sans-serif !important; }
+        .font-mono { font-family: 'JetBrains Mono', monospace !important; }
+        
+        * {
+            font-family: 'Inter', 'JetBrains Mono', 'Orbitron', sans-serif;
         }
+
         @keyframes scanline {
             0% { transform: translateY(-100%); }
             100% { transform: translateY(100%); }
@@ -23,24 +35,63 @@
         .scanline {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 2px;
-            background: rgba(0, 255, 255, 0.1);
-            animation: scanline 8s linear infinite;
+            background: rgba(6, 182, 212, 0.1);
+            animation: scanline 6s linear infinite;
             pointer-events: none;
             z-index: 50;
         }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 5px;
+        
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #020202; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+        .tech-border {
+            position: relative;
+            border: 1px solid rgba(30, 41, 59, 0.5);
+            background: rgba(15, 23, 42, 0.3);
+            backdrop-filter: blur(12px);
         }
-        ::-webkit-scrollbar-track {
-            background: #050505;
+
+        /* html2canvas stability fixes for Chinese text */
+        .export-text {
+            display: block; /* Switched back to block for consistent text-indent */
+            margin: 0 !important;
+            padding: 0 !important;
+            line-height: 1.6;
+            text-align: left;
+            word-break: break-all;
+            white-space: normal;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #1a1a1a;
-            border-radius: 5px;
+
+        .indent-text {
+            text-indent: 2em; /* Ensure two Chinese characters width indent */
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #333;
+
+        /* Ensure no gaps that cause ghost newlines in canvas */
+        .export-text span {
+            display: inline;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Ensure clean rendering in canvas */
+        #capture-container * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .global-protocol-frame {
+            border: 2px solid rgba(6, 182, 212, 0.2);
+            position: relative;
+        }
+        
+        .frame-corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-color: #06b6d4;
+            border-style: solid;
         }
     </style>
 <script type="importmap">

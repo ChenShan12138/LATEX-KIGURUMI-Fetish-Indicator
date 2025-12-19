@@ -2,9 +2,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResult, Language } from "./types";
 
-/**
- * Resizes an image to ensure it doesn't exceed a certain dimension or payload size.
- */
 const resizeImage = (base64Str: string, maxDimension: number = 1024): Promise<string> => {
   return new Promise((resolve) => {
     const img = new Image();
@@ -13,7 +10,6 @@ const resizeImage = (base64Str: string, maxDimension: number = 1024): Promise<st
       const canvas = document.createElement('canvas');
       let width = img.width;
       let height = img.height;
-
       if (width > height) {
         if (width > maxDimension) {
           height *= maxDimension / width;
@@ -25,7 +21,6 @@ const resizeImage = (base64Str: string, maxDimension: number = 1024): Promise<st
           height = maxDimension;
         }
       }
-
       canvas.width = width;
       canvas.height = height;
       const ctx = canvas.getContext('2d');
@@ -37,14 +32,11 @@ const resizeImage = (base64Str: string, maxDimension: number = 1024): Promise<st
 
 const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
 
-// @google/genai Guideline: Always use process.env.API_KEY exclusively.
-// The GoogleGenAI instance must be initialized with only the apiKey property.
 export const analyzeFetishImage = async (
   base64Image: string,
   lang: Language,
   attempt: number = 1
 ): Promise<AnalysisResult> => {
-  // Initialize the AI client with the mandatory API key.
   const ai = new GoogleGenAI({ 
     apiKey: process.env.API_KEY as string
   });
@@ -53,29 +45,40 @@ export const analyzeFetishImage = async (
     const compressedImage = await resizeImage(base64Image);
     const base64Data = compressedImage.split(',')[1];
 
-    const prompt = `你现在是“形态契合评估中心”的首席评估官，性格挑剔、追求极致、语调充满挑逗性与掌控欲。
+    const prompt = `你现在是“填充物素体品质评估中心”的首席评估官，性格挑剔、追求极致、语调充满挑逗性与掌控欲。
 
 任务目标：
 1. 识别图片内容：判断是以乳胶(胶衣)为主，还是以Kigurumi(头壳与kig皮)为主。
-2. **术语规范（强制执行）**：
-   - 严禁出现括号批注（如“（Latex）”）等书面化多余表达。
-   - 所有面具、全头装束一律称呼为“头壳”。
-   - 乳胶材质的紧身衣称为“胶衣”。
-   - 布料材质的紧身衣称为“kig皮”。
-3. **针对性评语逻辑**：
-   - **乳胶题材**：强调光泽、肉体被包裹后的曲线、以及作为“物件”的质感。
-   - **Kigurumi题材**：重心在于“角色代入”。识别角色及作品，提及原作关系链，创造沉溺感。
-   - **无关题材**：评分 1。用冷酷的话语斥责。
+2. **评价维度（分值0.0-10.0）**：
+   - 精致：考察面具妆造、表情生动度、还原度、摄影构图与分辨率。
+   - 质感：考察服饰/面具质感、胶衣光泽、光影处理、背景选择。
+   - 张力：考察整体视觉艺术感、动作与构图的张力。
+   - 协调：考察肢体控制、氛围感、身材比例（身材越瘦、比例越好分数越高）。
+   - 诱惑：考察姿势的大胆/性暗示程度、配件（眼罩、口球、电击器、拘束具等）、表情（诶嘿颜等）。
+3. **Tags要求（1-6个）**：
+   - **严禁**使用：作品IP名、角色名、"头壳"、"kig皮"、"cosplay"、"乳胶"等平庸描述。
+   - **必须**选择：极具挑逗性、令人兴奋的词汇，如“人偶化”、“发光玩物”、“呼吸限制”、“绝对禁锢”、“失智填充”、“视觉高潮”等。
+4. **称号（summaryPhraseZh）**：
+   - 必须包含一个称号文本，以及你想重点高亮（突出显示）的**唯一**一个关键词。高亮词必须是称号文本的一部分。
+5. **总评对话（summaryDialogue）**：
+   - 以评审人的口吻直接对着素体说的一句话。
+   - 必须是最具侵略性、最精炼、最令人兴奋的一句话。绝对不要包含换行符。
+
+**限制条件**：
+- 禁止使用 Markdown 加粗语法。
+- 返回纯文本评价，不得有前后空格或多余换行。
 
 返回 JSON 格式：
-- rating: 1-7 的整数。
-- summaryPhraseZh: 称号。
+- rating: 1-7 (整数)。
+- summaryPhraseZh: 称号文本。
+- summaryHighlightKeywords: [必须且只能包含一个关键词]。
 - summaryPhraseEn: 英文称号。
-- comment: 评价。
-- dimensions: 5个维度（如：角色还原度、光泽感知、视觉冲击力等）。
+- comment: 专业评价（纯文本，首行不留空格，AI内部处理不需要缩进，前端会处理）。
+- summaryDialogue: 最精炼的挑逗对话（纯文本，绝对不要包含任何引号或换行）。
+- tags: 挑逗性标签数组。
+- dimensions: 包含固定名称（精致, 质感, 张力, 协调, 诱惑）及0-10分值的数组。
 `;
 
-    // @google/genai Guideline: Use ai.models.generateContent directly with model name and contents.
     const response = await ai.models.generateContent({
       model: 'gemini-3-pro-preview',
       contents: {
@@ -91,8 +94,14 @@ export const analyzeFetishImage = async (
           properties: {
             rating: { type: Type.INTEGER },
             summaryPhraseZh: { type: Type.STRING },
+            summaryHighlightKeywords: { type: Type.ARRAY, items: { type: Type.STRING } },
             summaryPhraseEn: { type: Type.STRING },
             comment: { type: Type.STRING },
+            summaryDialogue: { type: Type.STRING },
+            tags: { 
+              type: Type.ARRAY, 
+              items: { type: Type.STRING } 
+            },
             dimensions: {
               type: Type.ARRAY,
               items: {
@@ -105,18 +114,27 @@ export const analyzeFetishImage = async (
               }
             }
           },
-          required: ["rating", "summaryPhraseZh", "summaryPhraseEn", "comment", "dimensions"]
+          required: ["rating", "summaryPhraseZh", "summaryHighlightKeywords", "summaryPhraseEn", "comment", "summaryDialogue", "tags", "dimensions"]
         }
       }
     });
 
-    // @google/genai Guideline: Access the text property directly (not a method).
-    return JSON.parse(response.text || '{}') as AnalysisResult;
+    const parsed = JSON.parse(response.text || '{}');
+    // Force keyword list to contain only one element
+    const keywords = parsed.summaryHighlightKeywords || [];
+    const finalKeywords = keywords.length > 0 ? [keywords[0]] : [];
+
+    return {
+      ...parsed,
+      summaryHighlightKeywords: finalKeywords,
+      summaryPhraseZh: parsed.summaryPhraseZh?.trim() || "",
+      summaryDialogue: parsed.summaryDialogue?.trim().replace(/["“”]/g, '') || "",
+      comment: parsed.comment?.trim() || "",
+    } as AnalysisResult;
 
   } catch (error: any) {
-    // Handle 503 Service Unavailable with retries
     if ((error.status === 503 || error.message?.includes('503') || error.message?.includes('Rpc failed')) && attempt < 3) {
-      console.warn(`Attempt ${attempt} failed with 503. Retrying in ${attempt * 2}s...`);
+      console.warn(`Attempt ${attempt} failed. Retrying...`);
       await delay(attempt * 2000);
       return analyzeFetishImage(base64Image, lang, attempt + 1);
     }

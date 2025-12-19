@@ -7,7 +7,7 @@ import { AnalysisProgress } from './components/AnalysisProgress';
 import { ResultView } from './components/ResultView';
 import { analyzeFetishImage } from './geminiService';
 
-const VERSION = "v1.2.8";
+const VERSION = "v2.0.1";
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('zh');
@@ -39,7 +39,6 @@ const App: React.FC = () => {
       setResult(res);
     } catch (err: any) {
       const is503 = err.message?.includes('503') || err.message?.includes('Rpc failed');
-      // @google/genai Guideline: Removed mentions of custom endpoints as they are prohibited.
       const msg = is503 
         ? (lang === 'zh' ? "后端负载过高 (503)。服务正在拥塞，请稍后重试。" : "Service Unavailable (503). System is congested, please try again later.")
         : (lang === 'zh' ? "评估中断。请检查网络连接或 API 配置。" : "Assessment Aborted. Check connection or API config.");
