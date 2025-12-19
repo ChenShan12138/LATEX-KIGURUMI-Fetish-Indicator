@@ -12,7 +12,10 @@
     "@google/genai": "^1.34.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "recharts": "2.12.7"
+    "recharts": "2.12.7",
+    "html2canvas": "1.4.1",
+    "@vitejs/plugin-react": "^5.1.2",
+    "vite": "^7.3.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",

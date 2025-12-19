@@ -1,8 +1,6 @@
 
-import React, { useState, useCallback } from 'react';
-// Corrected import: LANGUAGES is defined in types.ts
+import React, { useState } from 'react';
 import { Language, AnalysisResult, LANGUAGES } from './types';
-// Corrected import: Removed LANGUAGES from constants.tsx import
 import { DICTIONARIES, QUOTES } from './constants';
 import { BackgroundElements } from './components/BackgroundElements';
 import { AnalysisProgress } from './components/AnalysisProgress';
@@ -31,15 +29,20 @@ const App: React.FC = () => {
     }
   };
 
+  /**
+   * Triggers the analysis workflow.
+   * API Key is managed via environment variables and injected automatically.
+   */
   const processAnalysis = async (imgData: string) => {
     setAnalyzing(true);
     setError(null);
     try {
       const res = await analyzeFetishImage(imgData, lang);
       setResult(res);
-    } catch (err) {
-      setError("Analysis failed. Please check your network or API key.");
+    } catch (err: any) {
+      setError("Analysis failed. Verify your network connection and API configuration.");
       console.error(err);
+      setImage(null);
     } finally {
       setAnalyzing(false);
     }
@@ -49,6 +52,7 @@ const App: React.FC = () => {
     setImage(null);
     setResult(null);
     setAnalyzing(false);
+    setError(null);
   };
 
   return (
@@ -56,26 +60,38 @@ const App: React.FC = () => {
       <BackgroundElements />
 
       {/* Header */}
-      <header className="relative z-10 flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
+      <header className="relative z-50 flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
         <div className="text-center md:text-left">
-          <h1 className="text-3xl md:text-5xl font-orbitron font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-fuchsia-500">
-            {dict.title}
-          </h1>
-          <p className="text-zinc-500 font-serif italic mt-1">{dict.subtitle}</p>
+          <div className="flex flex-col md:flex-row items-baseline gap-2">
+            <h1 className="text-3xl md:text-5xl font-orbitron font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-fuchsia-500">
+              {dict.title}
+            </h1>
+            {lang === 'zh' && (
+              <span className="text-[10px] font-mono text-zinc-600 tracking-[0.3em] uppercase hidden md:inline">LATEX_CHICKEN_INDICATOR</span>
+            )}
+          </div>
+          <div className="flex flex-col md:flex-row items-center md:items-baseline gap-2 mt-1">
+            <p className="text-zinc-500 font-serif italic">{dict.subtitle}</p>
+            {lang === 'zh' && (
+              <span className="text-[8px] font-mono text-zinc-700 tracking-widest uppercase hidden md:inline">// RE-SKINNING_TERMINAL_V2</span>
+            )}
+          </div>
         </div>
 
-        <div className="flex gap-2 bg-zinc-900/80 p-1 rounded-full border border-zinc-800">
-          {(Object.keys(LANGUAGES) as Language[]).map(l => (
-            <button
-              key={l}
-              onClick={() => setLang(l)}
-              className={`px-4 py-1 rounded-full text-xs font-orbitron transition-all ${
-                lang === l ? 'bg-cyan-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.4)]' : 'text-zinc-500 hover:text-zinc-300'
-              }`}
-            >
-              {LANGUAGES[l]}
-            </button>
-          ))}
+        <div className="flex items-center gap-4">
+          <div className="flex gap-2 bg-zinc-900/80 p-1 rounded-full border border-zinc-800">
+            {(Object.keys(LANGUAGES) as Language[]).map(l => (
+              <button
+                key={l}
+                onClick={() => setLang(l)}
+                className={`px-4 py-1 rounded-full text-xs font-orbitron transition-all ${
+                  lang === l ? 'bg-cyan-600 text-white shadow-[0_0_15px_rgba(6,182,212,0.4)]' : 'text-zinc-500 hover:text-zinc-300'
+                }`}
+              >
+                {LANGUAGES[l]}
+              </button>
+            ))}
+          </div>
         </div>
       </header>
 
@@ -97,9 +113,14 @@ const App: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
                   </div>
-                  <span className="text-lg font-orbitron tracking-widest text-zinc-400 group-hover:text-white transition-colors">
-                    {dict.uploadBtn}
-                  </span>
+                  <div className="flex flex-col items-center">
+                    <span className="text-lg font-orbitron tracking-widest text-zinc-400 group-hover:text-white transition-colors">
+                      {dict.uploadBtn}
+                    </span>
+                    {lang === 'zh' && (
+                      <span className="text-[10px] font-mono text-zinc-600 mt-1 uppercase tracking-widest group-hover:text-cyan-500 transition-colors">ACCESS ASSET</span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -119,8 +140,9 @@ const App: React.FC = () => {
         ) : null}
 
         {error && (
-          <div className="mt-8 text-red-500 font-mono text-sm bg-red-950/20 px-4 py-2 border border-red-900 rounded-lg">
-            ERR: {error}
+          <div className="mt-8 text-red-500 font-mono text-sm bg-red-950/20 px-6 py-3 border border-red-900 rounded-xl max-w-md text-center">
+            <div className="font-bold mb-1">SYSTEM_ERROR</div>
+            {error}
           </div>
         )}
       </main>
@@ -128,11 +150,11 @@ const App: React.FC = () => {
       {/* Footer / Safety Disclaimer */}
       <footer className="relative z-10 mt-12 py-6 border-t border-zinc-900/50 flex flex-col items-center gap-3">
         <div className="flex items-center gap-2">
-          <span className="px-2 py-0.5 bg-red-600/20 text-red-500 text-[10px] font-bold border border-red-600/30 rounded">
+          <span className="px-2 py-0.5 bg-red-600/20 text-red-500 text-[10px] font-bold border border-red-600/30 rounded uppercase tracking-tighter">
             {dict.warning}
           </span>
         </div>
-        <p className="text-[10px] text-zinc-600 text-center max-w-2xl px-4">
+        <p className="text-[10px] text-zinc-600 text-center max-w-2xl px-4 italic">
           {dict.disclaimer}
         </p>
       </footer>

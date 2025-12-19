@@ -2,7 +2,7 @@
 export type Language = 'zh' | 'en' | 'ja';
 
 export interface AnalysisResult {
-  rating: number; // 1-5
+  rating: number; // 1-7
   summaryPhrase: string;
   comment: string;
   dimensions: {
@@ -20,6 +20,7 @@ export interface Dictionary {
   warning: string;
   disclaimer: string;
   sinkingStages: string[];
+  onReset: string;
 }
 
 export const LANGUAGES: Record<Language, string> = {
