@@ -35,20 +35,25 @@ const resizeImage = (base64Str: string, maxDimension: number = 1024): Promise<st
   });
 };
 
+const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+
+// @google/genai Guideline: Always use process.env.API_KEY exclusively.
+// The GoogleGenAI instance must be initialized with only the apiKey property.
 export const analyzeFetishImage = async (
   base64Image: string,
-  lang: Language
+  lang: Language,
+  attempt: number = 1
 ): Promise<AnalysisResult> => {
-  // Initialize the AI client exclusively using the environment API key.
-  // Prohibited: baseUrl, custom key management UI.
+  // Initialize the AI client with the mandatory API key.
   const ai = new GoogleGenAI({ 
-    apiKey: process.env.API_KEY || ""
+    apiKey: process.env.API_KEY as string
   });
   
-  const compressedImage = await resizeImage(base64Image);
-  const base64Data = compressedImage.split(',')[1];
+  try {
+    const compressedImage = await resizeImage(base64Image);
+    const base64Data = compressedImage.split(',')[1];
 
-  const prompt = `你现在是“形态契合评估中心”的首席评估官，性格挑剔、追求极致、语调充满挑逗性与掌控欲。
+    const prompt = `你现在是“形态契合评估中心”的首席评估官，性格挑剔、追求极致、语调充满挑逗性与掌控欲。
 
 任务目标：
 1. 识别图片内容：判断是以乳胶(胶衣)为主，还是以Kigurumi(头壳与kig皮)为主。
@@ -57,63 +62,64 @@ export const analyzeFetishImage = async (
    - 所有面具、全头装束一律称呼为“头壳”。
    - 乳胶材质的紧身衣称为“胶衣”。
    - 布料材质的紧身衣称为“kig皮”。
-   - 将“头壳”和“kig皮”视为理所ある日常寻常装束，不要表现得大惊小怪。
-3. **语言风格与表达（核心要求）**：
-   - 使用目标语言(${lang})中最自然、地道、符合母语者习惯的表达方式。
-   - 拒绝翻译腔，拒绝死板的陈述。要像一个浸淫此文化多年的“老手”在进行私密的评价。
-4. **针对性评语逻辑**：
-   - **分支 A：乳胶/胶衣题材**：保持高压、挑逗的风格。强调光泽、肉体被包裹后的曲线扭曲、以及作为“物件”的完美质感。
-   - **分支 B：Kigurumi题材**：重心在于“灵魂替换”与“身份占有”。
-     - **角色深度挖掘**：必须识别角色及其所属作品。结合作品设定，创造出极具想象力的代入情境。
-     - **关系链引入**：提及该角色在原作中重要的人际关系。
-     - **情景设置**：描述角色现在的状态，强调这种“披着别人的皮，过着别人的人生”的沉溺感。
-   - **分支 C：无关题材**：评分 1。用最冷酷、毒舌的话语斥责。
-5. **视觉要素结合**：
-   - 结合背景来评价。
-   - 使用第二人称（“你”、“妳”、“君”）。
+3. **针对性评语逻辑**：
+   - **乳胶题材**：强调光泽、肉体被包裹后的曲线、以及作为“物件”的质感。
+   - **Kigurumi题材**：重心在于“角色代入”。识别角色及作品，提及原作关系链，创造沉溺感。
+   - **无关题材**：评分 1。用冷酷的话语斥责。
 
 返回 JSON 格式：
 - rating: 1-7 的整数。
 - summaryPhraseZh: 称号。
 - summaryPhraseEn: 英文称号。
-- comment: 深度结合图片细节的处理意见。
-- dimensions: 5个维度（如：角色还原度、光泽感知、意志侵染、视觉冲击力、形态契合度）。
+- comment: 评价。
+- dimensions: 5个维度（如：角色还原度、光泽感知、视觉冲击力等）。
 `;
 
-  const response = await ai.models.generateContent({
-    model: 'gemini-3-pro-preview',
-    contents: {
-      parts: [
-        { inlineData: { data: base64Data, mimeType: 'image/jpeg' } },
-        { text: prompt }
-      ]
-    },
-    config: {
-      responseMimeType: "application/json",
-      responseSchema: {
-        type: Type.OBJECT,
-        properties: {
-          rating: { type: Type.INTEGER },
-          summaryPhraseZh: { type: Type.STRING },
-          summaryPhraseEn: { type: Type.STRING },
-          comment: { type: Type.STRING },
-          dimensions: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                name: { type: Type.STRING },
-                value: { type: Type.NUMBER }
-              },
-              required: ["name", "value"]
+    // @google/genai Guideline: Use ai.models.generateContent directly with model name and contents.
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-pro-preview',
+      contents: {
+        parts: [
+          { inlineData: { data: base64Data, mimeType: 'image/jpeg' } },
+          { text: prompt }
+        ]
+      },
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            rating: { type: Type.INTEGER },
+            summaryPhraseZh: { type: Type.STRING },
+            summaryPhraseEn: { type: Type.STRING },
+            comment: { type: Type.STRING },
+            dimensions: {
+              type: Type.ARRAY,
+              items: {
+                type: Type.OBJECT,
+                properties: {
+                  name: { type: Type.STRING },
+                  value: { type: Type.NUMBER }
+                },
+                required: ["name", "value"]
+              }
             }
-          }
-        },
-        required: ["rating", "summaryPhraseZh", "summaryPhraseEn", "comment", "dimensions"]
+          },
+          required: ["rating", "summaryPhraseZh", "summaryPhraseEn", "comment", "dimensions"]
+        }
       }
-    }
-  });
+    });
 
-  // Directly access the text property of GenerateContentResponse.
-  return JSON.parse(response.text || '{}') as AnalysisResult;
+    // @google/genai Guideline: Access the text property directly (not a method).
+    return JSON.parse(response.text || '{}') as AnalysisResult;
+
+  } catch (error: any) {
+    // Handle 503 Service Unavailable with retries
+    if ((error.status === 503 || error.message?.includes('503') || error.message?.includes('Rpc failed')) && attempt < 3) {
+      console.warn(`Attempt ${attempt} failed with 503. Retrying in ${attempt * 2}s...`);
+      await delay(attempt * 2000);
+      return analyzeFetishImage(base64Image, lang, attempt + 1);
+    }
+    throw error;
+  }
 };

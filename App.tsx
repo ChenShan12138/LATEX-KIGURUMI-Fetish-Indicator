@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Language, AnalysisResult, LANGUAGES } from './types';
 import { DICTIONARIES, QUOTES } from './constants';
 import { BackgroundElements } from './components/BackgroundElements';
@@ -7,7 +7,7 @@ import { AnalysisProgress } from './components/AnalysisProgress';
 import { ResultView } from './components/ResultView';
 import { analyzeFetishImage } from './geminiService';
 
-const VERSION = "v1.2.7";
+const VERSION = "v1.2.8";
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('zh');
@@ -15,7 +15,7 @@ const App: React.FC = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+  
   const dict = DICTIONARIES[lang];
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,9 +38,11 @@ const App: React.FC = () => {
       const res = await analyzeFetishImage(imgData, lang);
       setResult(res);
     } catch (err: any) {
-      const msg = lang === 'zh' 
-        ? "评估中断。服务暂时不可用或配置失效。请检查网络连接。" 
-        : "Assessment Aborted. Service unavailable or invalid configuration. Please check your connection.";
+      const is503 = err.message?.includes('503') || err.message?.includes('Rpc failed');
+      // @google/genai Guideline: Removed mentions of custom endpoints as they are prohibited.
+      const msg = is503 
+        ? (lang === 'zh' ? "后端负载过高 (503)。服务正在拥塞，请稍后重试。" : "Service Unavailable (503). System is congested, please try again later.")
+        : (lang === 'zh' ? "评估中断。请检查网络连接或 API 配置。" : "Assessment Aborted. Check connection or API config.");
       setError(msg);
       console.error(err);
       setImage(null);
@@ -96,36 +98,23 @@ const App: React.FC = () => {
       {/* Main Area */}
       <main className="relative z-10 flex-1 flex flex-col items-center justify-center">
         {!image && !analyzing ? (
-          <div className="w-full max-w-lg space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <div className="w-full max-w-lg space-y-8">
             <div className="text-center space-y-4">
               <div className="p-10 border-2 border-dashed border-zinc-800 rounded-3xl hover:border-cyan-500/50 transition-colors group cursor-pointer relative bg-zinc-900/20 backdrop-blur-xl">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                />
+                <input type="file" accept="image/*" onChange={handleFileUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                 <div className="flex flex-col items-center gap-6">
-                  <div className="w-20 h-20 rounded-full bg-zinc-950 flex items-center justify-center border border-zinc-800 group-hover:border-cyan-500 group-hover:shadow-[0_0_30px_rgba(6,182,212,0.2)] transition-all">
+                  <div className="w-20 h-20 rounded-full bg-zinc-950 flex items-center justify-center border border-zinc-800 group-hover:border-cyan-500 transition-all">
                     <svg className="w-10 h-10 text-zinc-600 group-hover:text-cyan-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
                   </div>
-                  <div className="flex flex-col items-center">
-                    <span className="text-xl font-orbitron font-black tracking-[0.3em] text-zinc-500 group-hover:text-white transition-colors uppercase">
-                      {dict.uploadBtn}
-                    </span>
-                    <span className="text-[10px] font-mono text-zinc-700 mt-2 uppercase tracking-[0.4em] group-hover:text-cyan-500 transition-colors">ACCESSING_TERMINAL_INPUT</span>
-                  </div>
+                  <span className="text-xl font-orbitron font-black tracking-[0.3em] text-zinc-500 group-hover:text-white transition-colors uppercase">{dict.uploadBtn}</span>
                 </div>
               </div>
             </div>
-
             <div className="grid grid-cols-1 gap-4">
               {QUOTES.slice(0, 4).map((q, i) => (
-                <div key={i} className="text-[11px] text-zinc-600 font-serif italic text-center opacity-60 leading-relaxed tracking-wide">
-                  "{q}"
-                </div>
+                <div key={i} className="text-[11px] text-zinc-600 font-serif italic text-center opacity-60 leading-relaxed tracking-wide">"{q}"</div>
               ))}
             </div>
           </div>
@@ -139,23 +128,17 @@ const App: React.FC = () => {
           <div className="mt-8 text-red-500 font-mono text-sm bg-red-950/20 px-8 py-4 border border-red-900/50 rounded-2xl max-w-md text-center shadow-2xl animate-in slide-in-from-top-2 duration-300">
             <div className="font-black mb-2 tracking-widest text-xs">SYSTEM_FAILURE</div>
             <p className="opacity-80 leading-relaxed">{error}</p>
+            <div className="flex gap-4 justify-center mt-4">
+              <button onClick={() => window.location.reload()} className="text-[10px] text-cyan-500 underline uppercase tracking-widest hover:text-cyan-400">Retry Now</button>
+            </div>
           </div>
         )}
       </main>
 
-      {/* Footer / Safety Disclaimer */}
       <footer className="relative z-10 mt-12 py-8 border-t border-zinc-900/50 flex flex-col items-center gap-4">
-        <div className="flex items-center gap-2">
-          <span className="px-3 py-1 bg-red-900/20 text-red-500 text-[10px] font-black border border-red-900/30 rounded-lg uppercase tracking-[0.2em]">
-            {dict.warning}
-          </span>
-        </div>
-        <p className="text-[10px] text-zinc-600 text-center max-w-2xl px-6 italic leading-relaxed opacity-60">
-          {dict.disclaimer}
-        </p>
-        <div className="mt-4 text-[8px] font-mono text-zinc-800 tracking-[0.5em] uppercase opacity-40">
-          BUILD_HASH: {VERSION}_STABLE
-        </div>
+        <span className="px-3 py-1 bg-red-900/20 text-red-500 text-[10px] font-black border border-red-900/30 rounded-lg uppercase tracking-[0.2em]">{dict.warning}</span>
+        <p className="text-[10px] text-zinc-600 text-center max-w-2xl px-6 italic leading-relaxed opacity-60">{dict.disclaimer}</p>
+        <div className="mt-4 text-[8px] font-mono text-zinc-800 tracking-[0.5em] uppercase opacity-40">BUILD_HASH: {VERSION}_STABLE</div>
       </footer>
     </div>
   );
