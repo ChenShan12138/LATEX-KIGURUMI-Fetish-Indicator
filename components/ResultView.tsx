@@ -85,10 +85,20 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
         onclone: (clonedDoc) => {
           const el = clonedDoc.getElementById('capture-container');
           if (el) {
+            // 强行锁定 1200px 宽度以确保排版一致
             el.style.width = '1200px';
             el.style.margin = '0 auto';
             el.style.borderRadius = '0px';
             el.style.border = 'none';
+            el.style.maxHeight = 'none';
+            el.style.overflow = 'visible';
+            
+            // 修复移动端克隆后可能出现的 padding 问题
+            const innerContainer = el.querySelector('.report-inner-padding') as HTMLElement;
+            if (innerContainer) {
+              innerContainer.style.padding = '64px';
+              innerContainer.style.gap = '40px';
+            }
           }
         }
       });
@@ -104,20 +114,15 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
   };
 
   const RatingBox = () => (
-    <div className="tech-border rounded-3xl p-6 relative overflow-visible h-32 mt-16 bg-zinc-950/40">
-      {/* Quality_Rank: 左上角 */}
+    <div className="tech-border rating-box-container rounded-3xl p-6 relative overflow-visible h-32 mt-4 md:mt-6 bg-zinc-950/40">
       <div className={`absolute top-4 left-4 ${LABEL_STYLE} opacity-50`}>
         Quality_Rank
       </div>
-      
-      {/* 评级符号: 左右居中 */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[60%] pointer-events-none z-20">
         <span className={`text-[11rem] font-orbitron font-black italic leading-none ${colors.grade} ${colors.glow} tracking-tighter`}>
           {gradeLabel}
         </span>
       </div>
-      
-      {/* AUTHENTICATED: 右下角 */}
       <div className="absolute bottom-4 right-4 text-right">
         <div className="text-sm font-bold text-white tracking-[0.2em] font-orbitron uppercase leading-none">
           AUTHENTICATED
@@ -127,7 +132,7 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
   );
 
   const RadarBox = () => (
-    <div className="tech-border rounded-3xl p-6 flex flex-col h-[380px] bg-zinc-950/40">
+    <div className="tech-border rounded-3xl p-6 flex flex-col h-[340px] md:h-[380px] bg-zinc-950/40">
       <div className="flex justify-between items-center mb-4">
         <span className={LABEL_STYLE}>Morphology_Stats</span>
         <div className="w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#06b6d4]"></div>
@@ -147,15 +152,15 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
   );
 
   const CommentBox = () => (
-    <div className="tech-border rounded-3xl p-6 md:p-10 flex flex-col h-full relative bg-zinc-950/40">
-      <div className="flex items-center gap-4 mb-8">
+    <div className="tech-border rounded-3xl p-6 md:p-8 flex flex-col h-full relative bg-zinc-950/40">
+      <div className="flex items-center gap-4 mb-4">
         <span className={LABEL_STYLE}>CHIEF_OFFICER_LOG</span>
         <div className="h-px flex-1 bg-zinc-800/40"></div>
       </div>
       <div className="flex-1 overflow-hidden">
-        {/* 首行缩进两个字符 */}
+        {/* 显著放大字体并在底部留空防止截断 */}
         <p 
-          className="text-zinc-200 font-sans text-xl md:text-2xl leading-relaxed italic font-medium export-text block break-words"
+          className="text-zinc-200 font-sans text-3xl md:text-5xl leading-tight md:leading-snug italic font-bold export-text block break-words pb-8"
           style={{ textIndent: '2em' }}
         >
           {result.comment.trim()}
@@ -165,7 +170,7 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
   );
 
   const DialogueBox = () => (
-    <div className="relative mt-4 rounded-[2.5rem] overflow-hidden bg-zinc-950/60 border border-zinc-800/50 p-8 md:p-20 flex flex-col items-center justify-center min-h-[350px]">
+    <div className="relative mt-2 rounded-[2.5rem] overflow-hidden bg-zinc-950/60 border border-zinc-800/50 p-8 md:p-20 flex flex-col items-center justify-center min-h-[300px] md:min-h-[400px]">
       <div className="absolute inset-0 flex items-center justify-center gap-[2px] opacity-20 px-4 pointer-events-none">
         {Array.from({ length: 160 }).map((_, i) => {
           const x = i / 160;
@@ -177,17 +182,17 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
       </div>
       
       <div className="relative z-10 w-full flex flex-col items-start max-w-5xl">
-        <QuoteSVG className="absolute -top-12 md:-top-16 -left-6 md:-left-12 w-16 h-16 md:w-24 md:h-24 text-cyan-400 opacity-20" />
-        <QuoteSVG className="absolute -bottom-16 md:-bottom-24 -right-6 md:-right-12 w-16 h-16 md:w-24 md:h-24 text-cyan-400 opacity-20" flip />
+        <QuoteSVG className="absolute -top-12 md:-top-24 -left-4 md:-left-20 w-16 h-16 md:w-40 md:h-40 text-cyan-400 opacity-20" />
+        <QuoteSVG className="absolute -bottom-16 md:-bottom-32 -right-4 md:-right-20 w-16 h-16 md:w-40 md:h-40 text-cyan-400 opacity-20" flip />
 
-        <div className="flex items-center gap-2 mb-6 md:mb-10">
+        <div className="flex items-center gap-2 mb-4 md:mb-8">
            <div className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_10px_#06b6d4]"></div>
            <span className={`${LABEL_STYLE} text-cyan-400`}>DIRECT_VOICE_SYNC</span>
         </div>
         
-        {/* 首行缩进两个字符 */}
+        {/* 显著放大字体并在底部留空防止截断 */}
         <p 
-          className="text-cyan-400 font-sans text-2xl md:text-6xl font-black tracking-tighter italic leading-tight export-text block break-words drop-shadow-[0_0_20px_rgba(6,182,212,0.5)]"
+          className="text-cyan-400 font-sans text-4xl md:text-8xl font-black tracking-tighter italic leading-none export-text block break-words drop-shadow-[0_0_20px_rgba(6,182,212,0.5)] pb-12"
           style={{ textIndent: '2em' }}
         >
           {result.summaryDialogue.trim()}
@@ -197,11 +202,11 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
   );
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-10 pb-24 px-2 md:px-4 overflow-visible">
+    <div className="w-full max-w-7xl mx-auto space-y-6 pb-24 px-1 md:px-4 overflow-visible">
       <div 
         ref={reportRef} 
         id="capture-container"
-        className="bg-[#020202] rounded-[2rem] md:rounded-[3rem] overflow-hidden flex flex-col shadow-2xl global-protocol-frame border-zinc-800/50"
+        className="bg-[#020202] rounded-[1.5rem] md:rounded-[3rem] overflow-hidden flex flex-col shadow-2xl global-protocol-frame border-zinc-800/50"
       >
         <div className="window-header h-12">
           <div className="flex gap-2">
@@ -209,28 +214,28 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
             <div className="dot dot-yellow"></div>
             <div className="dot dot-green"></div>
           </div>
-          <div className="flex-1 text-center text-[9px] md:text-[10px] font-mono text-zinc-600 tracking-[0.2em] md:tracking-[0.4em] uppercase">
+          <div className="flex-1 text-center text-[8px] md:text-[10px] font-mono text-zinc-600 tracking-[0.2em] md:tracking-[0.4em] uppercase">
             SECURE_TERMINAL_ACCESS // REPORT_ID_{Math.floor(Date.now()/1000)}
           </div>
         </div>
 
-        <div className="p-6 md:p-16 flex flex-col gap-10 md:gap-12 relative bg-[#020202]">
-          <div className="flex flex-col md:flex-row justify-between items-center border-b border-zinc-900 pb-8 md:pb-10 gap-6">
+        <div className="report-inner-padding p-3 md:p-16 flex flex-col gap-4 md:gap-10 relative bg-[#020202]">
+          <div className="flex flex-col md:flex-row justify-between items-center border-b border-zinc-900 pb-4 md:pb-10 gap-4 md:gap-6">
             <div className="text-center md:text-left">
-              <h4 className="text-white font-orbitron font-black text-sm md:text-base tracking-[0.4em] md:tracking-[0.6em] uppercase export-text block leading-tight">{dict.title}</h4>
-              <p className="text-zinc-600 font-mono text-[9px] md:text-[10px] tracking-widest mt-2 md:mt-3 uppercase block">UNIT_07_TERMINAL // MORPH_ANALYSIS_STABLE</p>
+              <h4 className="text-white font-orbitron font-black text-xs md:text-base tracking-[0.4em] md:tracking-[0.6em] uppercase export-text block leading-tight">{dict.title}</h4>
+              <p className="text-zinc-600 font-mono text-[8px] md:text-[10px] tracking-widest mt-1 md:mt-3 uppercase block">UNIT_07_TERMINAL // MORPH_ANALYSIS_STABLE</p>
             </div>
-            <div className="text-[9px] md:text-[10px] font-mono text-zinc-700 tracking-[0.2em] md:tracking-[0.3em] uppercase text-right leading-relaxed export-text block">
+            <div className="text-[8px] md:text-[10px] font-mono text-zinc-700 tracking-[0.1em] md:tracking-[0.3em] uppercase text-right leading-relaxed export-text block">
               ENCRYPTION: AES_256_ACTIVE<br/>
               IDENTITY: SUBMERGED_PROTOCOL
             </div>
           </div>
 
-          <div className="text-center space-y-4 md:space-y-6">
-            <div className="flex items-center justify-center gap-4 md:gap-6 opacity-20">
-              <span className="h-px w-16 md:w-24 bg-cyan-500"></span>
+          <div className="text-center space-y-2 md:space-y-6">
+            <div className="flex items-center justify-center gap-2 md:gap-6 opacity-20">
+              <span className="h-px w-10 md:w-24 bg-cyan-500"></span>
               <span className={LABEL_STYLE}>FORM_ANALYSIS_DATA</span>
-              <span className="h-px w-16 md:w-24 bg-cyan-500"></span>
+              <span className="h-px w-10 md:w-24 bg-cyan-500"></span>
             </div>
             <h2 className="text-3xl md:text-7xl font-orbitron font-black text-white tracking-tight italic leading-[1.1] block">
               <HighlightedTitle text={result.summaryPhraseZh} keywords={result.summaryHighlightKeywords} accent={colors.accent} />
@@ -238,43 +243,37 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
             <p className="text-[10px] md:text-base font-orbitron font-bold text-zinc-500 tracking-[0.3em] md:tracking-[0.6em] uppercase italic block">{result.summaryPhraseEn.trim()}</p>
           </div>
 
-          <div className="flex flex-col gap-10 md:gap-12">
+          <div className="flex flex-col gap-4 md:gap-10">
             {isPortrait ? (
-              <div className="flex flex-col gap-10 md:gap-12">
-                <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-10 md:gap-12 items-stretch">
-                  <div className="relative bg-zinc-950/40 rounded-[2rem] md:rounded-[2.5rem] border border-zinc-800/50 overflow-hidden shadow-2xl flex items-center justify-center min-h-[400px] md:min-h-[550px]">
+              <div className="flex flex-col gap-4 md:gap-10">
+                <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-4 md:gap-10 items-stretch">
+                  <div className="relative bg-zinc-950/40 rounded-[1.5rem] md:rounded-[2.5rem] border border-zinc-800/50 overflow-hidden shadow-2xl flex items-center justify-center min-h-[350px] md:min-h-[550px]">
                     <img src={image} alt="Specimen" className="max-w-full h-auto max-h-[85vh] block object-contain" />
-                    <div className="absolute top-6 md:top-8 left-8 md:left-10">
-                      <span className={`${LABEL_STYLE} text-zinc-600`}>SCAN_RENDER_STABLE</span>
-                    </div>
                   </div>
-                  <div className="flex flex-col gap-8 md:gap-10">
+                  <div className="flex flex-col gap-4 md:gap-8">
                     <RatingBox />
                     <RadarBox />
                   </div>
                 </div>
-                <div className="flex flex-wrap justify-center gap-3 md:gap-4 py-6 md:py-8 border-y border-zinc-900/50">
+                <div className="flex flex-wrap justify-center gap-2 md:gap-4 py-3 md:py-6 border-y border-zinc-900/50">
                   {result.tags.map((tag, idx) => (
-                    <span key={idx} className="px-5 md:px-8 py-2 md:py-3 rounded-full border border-zinc-800 bg-zinc-950 text-white font-mono text-[10px] md:text-[12px] font-black tracking-widest uppercase shadow-xl export-text">{tag}</span>
+                    <span key={idx} className="px-4 md:px-8 py-1.5 md:py-3 rounded-full border border-zinc-800 bg-zinc-950 text-white font-mono text-[9px] md:text-[14px] font-black tracking-widest uppercase shadow-xl export-text">{tag}</span>
                   ))}
                 </div>
                 <CommentBox />
               </div>
             ) : (
-              <div className="flex flex-col gap-10 md:gap-12">
-                <div className="relative bg-zinc-950/40 rounded-[2rem] md:rounded-[2.5rem] border border-zinc-800/50 overflow-hidden shadow-2xl flex items-center justify-center min-h-[300px] md:min-h-[400px]">
+              <div className="flex flex-col gap-4 md:gap-10">
+                <div className="relative bg-zinc-950/40 rounded-[1.5rem] md:rounded-[2.5rem] border border-zinc-800/50 overflow-hidden shadow-2xl flex items-center justify-center min-h-[250px] md:min-h-[400px]">
                   <img src={image} alt="Specimen" className="max-w-full h-auto max-h-[70vh] block object-contain" />
-                  <div className="absolute top-6 md:top-8 right-8 md:right-10">
-                    <span className={`${LABEL_STYLE} text-zinc-600`}>SCAN_RENDER_STABLE</span>
-                  </div>
                 </div>
-                <div className="flex flex-wrap justify-center gap-3 md:gap-4 py-6 md:py-8 border-y border-zinc-900/50">
+                <div className="flex flex-wrap justify-center gap-2 md:gap-4 py-3 md:py-6 border-y border-zinc-900/50">
                   {result.tags.map((tag, idx) => (
-                    <span key={idx} className="px-5 md:px-8 py-2 md:py-3 rounded-full border border-zinc-800 bg-zinc-950 text-white font-mono text-[10px] md:text-[12px] font-black tracking-widest uppercase shadow-xl export-text">{tag}</span>
+                    <span key={idx} className="px-4 md:px-8 py-1.5 md:py-3 rounded-full border border-zinc-800 bg-zinc-950 text-white font-mono text-[9px] md:text-[14px] font-black tracking-widest uppercase shadow-xl export-text">{tag}</span>
                   ))}
                 </div>
-                <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-8 md:gap-10">
-                  <div className="flex flex-col gap-8 md:gap-10">
+                <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-4 md:gap-10">
+                  <div className="flex flex-col gap-4 md:gap-8">
                     <RatingBox />
                     <RadarBox />
                   </div>
@@ -285,10 +284,10 @@ export const ResultView: React.FC<Props> = ({ result, lang, image, onReset }) =>
             
             <DialogueBox />
 
-            <div className="mt-8 md:mt-12 pt-8 md:pt-12 border-t border-zinc-900 flex flex-col items-center gap-3 md:gap-4">
+            <div className="mt-4 md:mt-12 pt-4 md:pt-12 border-t border-zinc-900 flex flex-col items-center gap-2 md:gap-4">
               <div className={`${LABEL_STYLE} tracking-[0.4em] md:tracking-[0.8em] opacity-40`}>Authorized_Protocol</div>
-              <div className="text-sm md:text-xl font-black text-white tracking-[0.2em] md:tracking-[0.4em] font-orbitron uppercase leading-none export-text block">MORPH_UNIT_07_TERMINAL</div>
-              <div className="text-[9px] md:text-[11px] font-mono text-zinc-600 tracking-[0.1em] md:tracking-[0.3em] lowercase export-text block">https://latex-kigurumi-fetish-indicator.vercel.app/</div>
+              <div className="text-[10px] md:text-xl font-black text-white tracking-[0.2em] md:tracking-[0.4em] font-orbitron uppercase leading-none export-text block">MORPH_UNIT_07_TERMINAL</div>
+              <div className="text-[8px] md:text-[11px] font-mono text-zinc-600 tracking-[0.1em] md:tracking-[0.3em] lowercase export-text block">https://latex-kigurumi-fetish-indicator.vercel.app/</div>
             </div>
           </div>
         </div>

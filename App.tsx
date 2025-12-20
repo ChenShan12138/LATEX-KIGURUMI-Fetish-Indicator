@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Language, AnalysisResult, LANGUAGES } from './types';
 import { DICTIONARIES, QUOTES } from './constants';
 import { BackgroundElements } from './components/BackgroundElements';
@@ -7,7 +7,10 @@ import { AnalysisProgress } from './components/AnalysisProgress';
 import { ResultView } from './components/ResultView';
 import { analyzeFetishImage } from './geminiService';
 
-const VERSION = "v2.0.6";
+const VERSION = "v2.0.7";
+
+// We remove the manual 'aistudio' declaration here to avoid conflicts with the pre-defined 
+// global types in the execution environment. We will access it via (window as any).
 
 const App: React.FC = () => {
   const [lang, setLang] = useState<Language>('zh');
@@ -15,8 +18,43 @@ const App: React.FC = () => {
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [hasKey, setHasKey] = useState<boolean | null>(null);
   
   const dict = DICTIONARIES[lang];
+
+  useEffect(() => {
+    const checkKey = async () => {
+      // Accessing aistudio from window. Assume it's provided by the environment.
+      const win = window as any;
+      if (win.aistudio) {
+        try {
+          const selected = await win.aistudio.hasSelectedApiKey();
+          setHasKey(selected);
+        } catch (e) {
+          console.error("Failed to check API key status", e);
+          setHasKey(false);
+        }
+      } else {
+        // Fallback or development environment logic
+        setHasKey(true);
+      }
+    };
+    checkKey();
+  }, []);
+
+  const handleSelectKey = async () => {
+    const win = window as any;
+    if (win.aistudio) {
+      try {
+        await win.aistudio.openSelectKey();
+        // A race condition can occur where hasSelectedApiKey() may not immediately return true.
+        // Assume the key selection was successful after triggering openSelectKey() and proceed.
+        setHasKey(true);
+      } catch (e) {
+        console.error("Failed to open key selection dialog", e);
+      }
+    }
+  };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -38,12 +76,26 @@ const App: React.FC = () => {
       const res = await analyzeFetishImage(imgData, lang);
       setResult(res);
     } catch (err: any) {
-      const is503 = err.message?.includes('503') || err.message?.includes('Rpc failed');
-      const msg = is503 
-        ? (lang === 'zh' ? "后端负载过高 (503)。服务正在拥塞，请稍后重试。" : "Service Unavailable (503). System is congested, please try again later.")
-        : (lang === 'zh' ? "评估中断。请检查网络连接或 API 配置。" : "Assessment Aborted. Check connection or API config.");
-      setError(msg);
       console.error(err);
+      let msg = (lang === 'zh' ? "评估中断。请检查网络连接。" : "Assessment Aborted.");
+      
+      const errorStr = err.message || "";
+      
+      if (errorStr.includes('429')) {
+        msg = (lang === 'zh' 
+          ? "API 配额已耗尽 (429)。请点击上方按钮切换自己的 API Key 或稍后再试。" 
+          : "Quota Exceeded (429). Please select your own API key or try again later.");
+      } else if (errorStr.includes('503')) {
+        msg = (lang === 'zh' ? "后端负载过高 (503)。服务拥塞中。" : "Service Congested (503).");
+      } else if (errorStr.includes('Requested entity was not found.')) {
+        // If the request fails with "Requested entity was not found.", reset key state 
+        // and prompt the user to select a key again via openSelectKey().
+        setHasKey(false);
+        handleSelectKey();
+        return;
+      }
+      
+      setError(msg);
       setImage(null);
     } finally {
       setAnalyzing(false);
@@ -68,16 +120,20 @@ const App: React.FC = () => {
             <h1 className="text-3xl md:text-5xl font-orbitron font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-fuchsia-500">
               {dict.title}
             </h1>
-            {lang === 'zh' && (
-              <span className="text-[10px] font-mono text-zinc-600 tracking-[0.3em] uppercase hidden md:inline">LATEX_KIGURUMI_INDICATOR</span>
-            )}
+            <span className="text-[10px] font-mono text-zinc-600 tracking-[0.3em] uppercase hidden md:inline">MORPH_QUALITY_ASSESS</span>
           </div>
-          <div className="flex flex-col md:flex-row items-center md:items-baseline gap-2 mt-1">
-            <p className="text-zinc-500 font-serif italic">{dict.subtitle}</p>
-          </div>
+          <p className="text-zinc-500 font-serif italic mt-1">{dict.subtitle}</p>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          {!hasKey && (
+             <button 
+               onClick={handleSelectKey}
+               className="px-4 py-2 bg-yellow-500/10 border border-yellow-500/50 text-yellow-500 text-[10px] font-black uppercase tracking-widest rounded-lg hover:bg-yellow-500 hover:text-black transition-all"
+             >
+               Set API Key (Fix 429)
+             </button>
+          )}
           <div className="flex gap-2 bg-zinc-900/80 p-1 rounded-full border border-zinc-800">
             {(Object.keys(LANGUAGES) as Language[]).map(l => (
               <button
@@ -95,7 +151,7 @@ const App: React.FC = () => {
       </header>
 
       {/* Main Area */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center">
+      <main className="relative z-10 flex-1 flex flex-col items-center justify-center w-full">
         {!image && !analyzing ? (
           <div className="w-full max-w-lg space-y-8">
             <div className="text-center space-y-4">
